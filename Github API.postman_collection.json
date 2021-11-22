@@ -1,0 +1,487 @@
+{
+	"info": {
+		"_postman_id": "1329a887-47c3-4ce8-831c-5ab9bffc1aa8",
+		"name": "Github API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Github Get User's repos",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.environment.set(\"myUser\", \"ircia-h\");\r",
+							"pm.environment.set(\"repoPath\", \"Test-repository\");\r",
+							"pm.environment.set(\"issueTitle\", \"Found a bug\");\r",
+							"pm.environment.set(\"issueNumber\", \"1\");"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "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",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}/users/:username/repos",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"users",
+						":username",
+						"repos"
+					],
+					"variable": [
+						{
+							"key": "username",
+							"value": "{{myUser}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Github Create repo",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();\r",
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"    pm.environment.set(\"repoPath\",jsonData.name);  \r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"accept": true
+				}
+			},
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/vnd.github.v3+json",
+						"type": "text"
+					},
+					{
+						"key": "X-OAuth-Scopes",
+						"value": "repo, user",
+						"type": "text"
+					},
+					{
+						"key": "X-Accepted-OAuth-Scopes",
+						"value": "user",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"Test repository\",\r\n    \"description\": \"This is a test repository created by Postman\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/user/repos",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"user",
+						"repos"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Github Get Repo by name",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}/repos/:owner/:repo",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"repos",
+						":owner",
+						":repo"
+					],
+					"variable": [
+						{
+							"key": "owner",
+							"value": "{{myUser}}"
+						},
+						{
+							"key": "repo",
+							"value": "{{repoPath}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Github Create an issue",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();\r",
+							"pm.environment.set(\"issueNumber\", jsonData.number);\r",
+							"\r",
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"title\": \"{{issueTitle}}\",\r\n    \"body\": \"This issue has been automatically created by Postman.\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/repos/:owner/:repo/issues",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"repos",
+						":owner",
+						":repo",
+						"issues"
+					],
+					"variable": [
+						{
+							"key": "owner",
+							"value": "{{myUser}}"
+						},
+						{
+							"key": "repo",
+							"value": "{{repoPath}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Github Get Issue by ID",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Issue title check\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.title).to.eql(pm.environment.get(\"issueTitle\"));\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}/repos/:owner/:repo/issues/:issue_number",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"repos",
+						":owner",
+						":repo",
+						"issues",
+						":issue_number"
+					],
+					"variable": [
+						{
+							"key": "owner",
+							"value": "{{myUser}}"
+						},
+						{
+							"key": "repo",
+							"value": "{{repoPath}}"
+						},
+						{
+							"key": "issue_number",
+							"value": "{{issueNumber}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Github Check comment",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"if(pm.response.text().includes(\"Thank you for reporting this issue. I will look into it as soon as possible.\"))\r",
+							"    postman.setNextRequest(\"Github Cleanup check\")\r",
+							"else \r",
+							"    postman.setNextRequest(\"Github Post Auto Comment\");"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}/repos/:owner/:repo/issues/:issue_number/comments",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"repos",
+						":owner",
+						":repo",
+						"issues",
+						":issue_number",
+						"comments"
+					],
+					"variable": [
+						{
+							"key": "owner",
+							"value": "{{myUser}}"
+						},
+						{
+							"key": "repo",
+							"value": "{{repoPath}}"
+						},
+						{
+							"key": "issue_number",
+							"value": "{{issueNumber}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Github Post Auto Comment",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"body\": \"Thank you for reporting this issue. I will look into it as soon as possible.\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/repos/:owner/:repo/issues/:issue_number/comments",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"repos",
+						":owner",
+						":repo",
+						"issues",
+						":issue_number",
+						"comments"
+					],
+					"variable": [
+						{
+							"key": "owner",
+							"value": "{{myUser}}"
+						},
+						{
+							"key": "repo",
+							"value": "{{repoPath}}"
+						},
+						{
+							"key": "issue_number",
+							"value": "{{issueNumber}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Github Cleanup",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 204\", function () {\r",
+							"    pm.response.to.have.status(204);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}/repos/:owner/:repo",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"repos",
+						":owner",
+						":repo"
+					],
+					"variable": [
+						{
+							"key": "owner",
+							"value": "{{myUser}}"
+						},
+						{
+							"key": "repo",
+							"value": "{{repoPath}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Github Cleanup check",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 404\", function () {\r",
+							"    pm.response.to.have.status(404);\r",
+							"});\r",
+							"\r",
+							"pm.environment.unset(\"issueNumber\");\r",
+							"pm.environment.unset(\"issueTitle\");\r",
+							"pm.environment.unset(\"myUser\");\r",
+							"pm.environment.unset(\"repoPath\");"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}/repos/:owner/:repo",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"repos",
+						":owner",
+						":repo"
+					],
+					"variable": [
+						{
+							"key": "owner",
+							"value": "{{myUser}}",
+							"type": "string"
+						},
+						{
+							"key": "repo",
+							"value": "{{repoPath}}",
+							"type": "string"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "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",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
