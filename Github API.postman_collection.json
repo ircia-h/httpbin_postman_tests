@@ -27,7 +27,7 @@
 					"bearer": [
 						{
 							"key": "token",
-							"value": "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",
+							"value": "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",
 							"type": "string"
 						}
 					]
@@ -459,7 +459,7 @@
 		"bearer": [
 			{
 				"key": "token",
-				"value": "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",
+				"value": "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",
 				"type": "string"
 			}
 		]
