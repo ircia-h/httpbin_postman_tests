@@ -22,16 +22,6 @@
 				}
 			],
 			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "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",
-							"type": "string"
-						}
-					]
-				},
 				"method": "GET",
 				"header": [],
 				"url": {
